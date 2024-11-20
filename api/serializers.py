@@ -1,21 +1,9 @@
-from rest_framework import serializers
-from .models import CustomUser, FarmerProfile, Product
+from rest_framework import serializers 
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer  # Added import
+from users.serializers import UserSerializer  # Added import
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomUser
-        fields = ('id', 'username', 'email', 'role', 'is_disabled')
-
-class FarmerProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
-
-    class Meta:
-        model = FarmerProfile
-        fields = ('id', 'user', 'farm_size', 'location', 'is_approved')
-
-class ProductSerializer(serializers.ModelSerializer):
-    farmer = FarmerProfileSerializer()
-
-    class Meta:
-        model = Product
-        fields = '__all__'
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer): 
+    def validate(self, attrs): 
+        data = super().validate(attrs) 
+        data['user'] = UserSerializer(self.user).data 
+        return data

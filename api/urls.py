@@ -1,10 +1,16 @@
-from django.urls import path
-from .views import (
-    CustomTokenObtainPairView, DashboardStatsView, PendingFarmersView,
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from products.views import ProductViewSet
+from api.views import CustomTokenObtainPairView
+from users.views import (
+    DashboardStatsView, PendingFarmersView,
     ApproveFarmerView, RejectFarmerView, UsersListView,
-    UpdateUserStatusView, ProductsListView, CreateBuyerProfileView
+    UpdateUserStatusView
 )
 from rest_framework_simplejwt.views import TokenVerifyView
+
+router = DefaultRouter()
+router.register(r'products', ProductViewSet, basename='products')
 
 urlpatterns = [
     path('login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -15,6 +21,5 @@ urlpatterns = [
     path('admin/reject-farmer/', RejectFarmerView.as_view()),
     path('admin/users/', UsersListView.as_view()),
     path('admin/update-user-status/', UpdateUserStatusView.as_view()),
-    path('admin/products/', ProductsListView.as_view()),
-    path('create_buyer_profile/', CreateBuyerProfileView.as_view(), name='create_buyer_profile'),
+    path('', include(router.urls)),  # Includes all router-based endpoints
 ]
